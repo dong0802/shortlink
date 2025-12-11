@@ -149,19 +149,5 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Serve index.html for other routes
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public', 'index.html'));
-});
-
-// Error handler
-app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    res.status(500).json({
-        error: 'Internal server error',
-        message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message
-    });
-});
-
 // Export for Vercel
 module.exports = app;

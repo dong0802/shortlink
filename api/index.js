@@ -10,7 +10,7 @@ const app = express();
 let cachedDb = null;
 
 const connectDB = async () => {
-    if (cachedDb) {
+    if (cachedDb && mongoose.connection.readyState === 1) {
         console.log('Using cached database connection');
         return cachedDb;
     }
@@ -20,22 +20,34 @@ const connectDB = async () => {
             'mongodb+srv://dong2004_db_user:dong2004@cluster0.znykq07.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
         console.log('Connecting to MongoDB...');
+
+        // Close existing connection if any
+        if (mongoose.connection.readyState !== 0) {
+            await mongoose.disconnect();
+        }
+
         const conn = await mongoose.connect(mongoURI, {
             bufferCommands: false,
-            serverSelectionTimeoutMS: 5000,
+            maxPoolSize: 10,
+            serverSelectionTimeoutMS: 10000,
+            socketTimeoutMS: 45000,
         });
 
         cachedDb = conn;
-        console.log('MongoDB Connected');
+        console.log('MongoDB Connected:', conn.connection.host);
         return cachedDb;
     } catch (error) {
         console.error('MongoDB Connection Error:', error.message);
+        cachedDb = null;
         throw error;
     }
 };
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: true,
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -49,13 +61,21 @@ app.use(async (req, res, next) => {
         await connectDB();
         next();
     } catch (error) {
-        res.status(500).json({ error: 'Database connection failed' });
+        console.error('DB connection failed:', error);
+        res.status(500).json({
+            error: 'Database connection failed',
+            message: error.message
+        });
     }
 });
 
 // API Routes
-app.use('/api/auth', require('../routes/auth'));
-app.use('/api/links', require('../routes/links'));
+try {
+    app.use('/api/auth', require('../routes/auth'));
+    app.use('/api/links', require('../routes/links'));
+} catch (error) {
+    console.error('Error loading routes:', error);
+}
 
 // Short code redirect route
 const ShortLink = require('../models/ShortLink');
@@ -120,9 +140,27 @@ app.get('/:shortCode', async (req, res, next) => {
     }
 });
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+        timestamp: new Date().toISOString()
+    });
+});
+
 // Serve index.html for other routes
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../public', 'index.html'));
+});
+
+// Error handler
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({
+        error: 'Internal server error',
+        message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message
+    });
 });
 
 // Export for Vercel

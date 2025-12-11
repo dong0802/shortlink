@@ -1,0 +1,15 @@
+node_modules
+.env
+.env.local
+.env.*.local
+.git
+.vscode
+.idea
+*.log
+test-*.js
+server.js
+server-simple.js
+README.md
+HUONG-DAN.md
+DEPLOY-VERCEL.md
+FIX-VERCEL.md

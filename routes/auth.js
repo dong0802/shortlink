@@ -23,7 +23,8 @@ router.post('/register', async (req, res) => {
         const user = new User({
             email,
             password,
-            verificationToken
+            verificationToken,
+            isVerified: !process.env.EMAIL_USER // Auto-verify if email not configured
         });
 
         await user.save();
@@ -36,8 +37,12 @@ router.post('/register', async (req, res) => {
             // Continue even if email fails
         }
 
+        const message = user.isVerified
+            ? 'Registration successful! You can now log in.'
+            : 'Registration successful! Please check your email to verify your account.';
+
         res.status(201).json({
-            message: 'Registration successful! Please check your email to verify your account.',
+            message,
             email: user.email
         });
     } catch (error) {
@@ -79,7 +84,8 @@ router.post('/login', async (req, res) => {
         res.cookie('token', token, {
             httpOnly: true,
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-            sameSite: 'lax'
+            sameSite: 'lax',
+            secure: process.env.NODE_ENV === 'production'
         });
 
         res.json({
@@ -136,8 +142,9 @@ router.get('/verify-email', async (req, res) => {
         <head>
           <title>Verification Failed</title>
           <style>
-            body { font-family: Arial; text-align: center; padding: 50px; }
+            body { font-family: Arial; text-align: center; padding: 50px; background: #0a0f1e; color: white; }
             .error { color: #ef4444; }
+            a { color: #6366f1; text-decoration: none; }
           </style>
         </head>
         <body>
@@ -159,7 +166,7 @@ router.get('/verify-email', async (req, res) => {
       <head>
         <title>Email Verified</title>
         <style>
-          body { font-family: Arial; text-align: center; padding: 50px; }
+          body { font-family: Arial; text-align: center; padding: 50px; background: #0a0f1e; color: white; }
           .success { color: #10b981; }
           .btn { 
             display: inline-block; 

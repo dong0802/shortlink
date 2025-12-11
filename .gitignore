@@ -4,3 +4,8 @@ node_modules/
 *.log
 .vscode/
 .idea/
+.vercel
+test-db.js
+test-server.js
+server-simple.js
+

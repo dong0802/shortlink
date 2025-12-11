@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShortLink - URL Shortener</title>
+  <meta name="description" content="Free URL shortener with analytics and history tracking">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="container">
+      <div class="nav-content">
+        <div class="logo">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <path d="M8 12L16 4L24 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8 20L16 28L24 20" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M4 16H28" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+          <span>ShortLink</span>
+        </div>
+        
+        <div class="nav-actions" id="navActions">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main id="mainContent">
+    <!-- Home Page -->
+    <section id="homePage" class="page active">
+      <div class="hero">
+        <div class="container">
+          <div class="hero-content">
+            <h1 class="hero-title">
+              Shorten Your Links
+              <span class="gradient-text">Instantly</span>
+            </h1>
+            <p class="hero-subtitle">
+              Free URL shortener with powerful analytics and click tracking
+            </p>
+
+            <!-- URL Shortener Form -->
+            <div class="shortener-card">
+              <form id="shortenForm" class="shorten-form">
+                <div class="input-group">
+                  <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M8.33333 10.8333C8.69114 11.3118 9.14777 11.7077 9.67214 11.9943C10.1965 12.281 10.7764 12.4518 11.3721 12.4958C11.9679 12.5397 12.5665 12.4559 13.1281 12.2497C13.6898 12.0436 14.2019 11.7197 14.6333 11.3L17.1333 8.8C17.8732 8.02686 18.2822 6.99547 18.2729 5.92581C18.2636 4.85615 17.8367 3.83217 17.0836 3.07238C16.3305 2.31259 15.3108 1.87527 14.2412 1.85462C13.1716 1.83396 12.1372 2.23144 11.3583 2.96667L9.74167 4.575" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M11.6667 9.16667C11.3089 8.68824 10.8522 8.29235 10.3279 8.00568C9.80349 7.71901 9.22359 7.54821 8.62783 7.50426C8.03207 7.46031 7.43354 7.54413 6.87188 7.75028C6.31023 7.95642 5.79813 8.28033 5.36667 8.7L2.86667 11.2C2.12677 11.9731 1.71776 13.0045 1.72707 14.0742C1.73638 15.1438 2.16328 16.1678 2.91639 16.9276C3.6695 17.6874 4.68918 18.1247 5.75881 18.1454C6.82844 18.166 7.86283 17.7686 8.64167 17.0333L10.25 15.425" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <input 
+                    type="url" 
+                    id="urlInput" 
+                    placeholder="Enter your long URL here..." 
+                    required
+                  >
+                </div>
+                <button type="submit" class="btn btn-primary" id="shortenBtn">
+                  <span>Shorten URL</span>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M4.16667 10H15.8333M15.8333 10L10 4.16667M15.8333 10L10 15.8333" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </button>
+              </form>
+
+              <!-- Result -->
+              <div id="resultSection" class="result-section hidden">
+                <div class="result-content">
+                  <div class="result-label">Your shortened URL:</div>
+                  <div class="result-url-container">
+                    <a href="#" id="shortUrl" target="_blank" class="result-url"></a>
+                    <button class="btn-copy" id="copyBtn" title="Copy to clipboard">
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M4.16667 12.5H3.33333C2.89131 12.5 2.46738 12.3244 2.15482 12.0118C1.84226 11.6993 1.66667 11.2754 1.66667 10.8333V3.33333C1.66667 2.89131 1.84226 2.46738 2.15482 2.15482C2.46738 1.84226 2.89131 1.66667 3.33333 1.66667H10.8333C11.2754 1.66667 11.6993 1.84226 12.0118 2.15482C12.3244 2.46738 12.5 2.89131 12.5 3.33333V4.16667M9.16667 7.5H16.6667C17.5871 7.5 18.3333 8.24619 18.3333 9.16667V16.6667C18.3333 17.5871 17.5871 18.3333 16.6667 18.3333H9.16667C8.24619 18.3333 7.5 17.5871 7.5 16.6667V9.16667C7.5 8.24619 8.24619 7.5 9.16667 7.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Features -->
+            <div class="features-grid">
+              <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Analytics</h3>
+                <p>Track clicks, IPs, and user agents</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Telegram Alerts</h3>
+                <p>Get notified on every click</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>History</h3>
+                <p>View all your shortened links</p>
+              </div>
+              <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Secure</h3>
+                <p>Email verification & JWT auth</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- History Page -->
+    <section id="historyPage" class="page">
+      <div class="container">
+        <div class="page-header">
+          <h1>Link History</h1>
+          <p>View and manage all your shortened links</p>
+        </div>
+
+        <div id="historyContent">
+          <!-- Will be populated by JavaScript -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="modal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- Login Form -->
+      <div id="loginForm" class="auth-form active">
+        <h2>Welcome Back</h2>
+        <p class="auth-subtitle">Sign in to access your link history</p>
+
+        <form id="loginFormElement">
+          <div class="form-group">
+            <label for="loginEmail">Email</label>
+            <input type="email" id="loginEmail" required>
+          </div>
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+        </form>
+
+        <div class="auth-switch">
+          Don't have an account? 
+          <a href="#" id="showRegister">Sign up</a>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerForm" class="auth-form">
+        <h2>Create Account</h2>
+        <p class="auth-subtitle">Sign up to track your shortened links</p>
+
+        <form id="registerFormElement">
+          <div class="form-group">
+            <label for="registerEmail">Email</label>
+            <input type="email" id="registerEmail" required>
+          </div>
+          <div class="form-group">
+            <label for="registerPassword">Password</label>
+            <input type="password" id="registerPassword" required minlength="6">
+          </div>
+          <div class="form-group">
+            <label for="registerPasswordConfirm">Confirm Password</label>
+            <input type="password" id="registerPasswordConfirm" required minlength="6">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Sign Up</button>
+        </form>
+
+        <div class="auth-switch">
+          Already have an account? 
+          <a href="#" id="showLogin">Sign in</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
+  <script src="/script.js"></script>
+</body>
+</html>
